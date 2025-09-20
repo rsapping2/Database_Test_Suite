@@ -6,19 +6,13 @@ This project contains a suite of database tests focused on user-related function
 ## Issues Resolved
 The project originally had two critical database issues that have been fixed:
 
-### 1. Foreign Key Constraint Violation
-**Problem**: Test cleanup failed due to foreign key constraints between `users` and `user_audit_logs` tables.
-**Error**: `update or delete on table "users" violates foreign key constraint "user_audit_logs_user_id_fkey"`
-
-**Solution**: Added proper transaction handling with `BEGIN`/`COMMIT`/`ROLLBACK` pattern in the `beforeEach` cleanup.
-
-### 2. Missing Required Field
+### 1. Missing Required Field
 **Problem**: First test case was missing the required `password_hash` field.
 **Error**: `User validation failed: security requirements not met (code: USR-102)`
 
 **Solution**: Added the missing `password_hash` field to the test case with proper validation.
 
-### 3. Dockerfile Infrastructure Updates (Not Part of Original Exercise)
+### 2. Dockerfile Infrastructure Updates (Not Part of Original Exercise)
 **Note**: The original exercise prompt stated "you should assume you don't need to change anything in the DB" and focused on test code fixes. However, the Dockerfile required infrastructure updates to work properly:
 
 **Problem**: The original Dockerfile used outdated Debian Buster (node:14) which no longer has PostgreSQL packages available in its repositories.
@@ -65,35 +59,6 @@ Starting PostgreSQL 13 database server: main.
   3 passing (274ms)
 ```
 
-## What This Project Tests
-
-- **User Creation**: Validates user registration with required fields
-- **Data Validation**: Tests age restrictions and password requirements  
-- **Constraint Handling**: Demonstrates proper foreign key constraint management
-- **Audit Logging**: Tests automatic audit trail creation
-- **Transaction Safety**: Shows proper database transaction handling
-
-## Database Schema
-
-The project uses a comprehensive PostgreSQL schema with:
-
-- **Users Table**: Core user information with validation constraints
-- **Audit Logs Table**: Tracks all user changes with foreign key references
-- **Triggers**: Automatic timestamp updates and audit logging
-- **Validation**: Age restrictions and password requirements
-
-## Technical Details
-
-### Database Version
-- **PostgreSQL 13** (upgraded from 11 due to package availability)
-- **Node.js 14** on Debian Bullseye
-- **Docker** containerized for easy deployment
-
-### Dependencies
-- `mocha`: Test framework
-- `chai`: Assertion library  
-- `pg`: PostgreSQL client for Node.js
-
 ## Docker Changes Made
 
 The Dockerfile was updated due to infrastructure changes:
@@ -109,11 +74,3 @@ If you encounter issues:
 2. **Permission Errors**: Make sure Docker has proper permissions
 3. **Port Conflicts**: The container uses internal PostgreSQL, no port conflicts expected
 
-## Learning Outcomes
-
-This project demonstrates:
-- How to handle database constraints properly
-- Transaction management best practices
-- Test cleanup strategies
-- Docker containerization for database testing
-- PostgreSQL trigger and validation patterns

@@ -3,12 +3,7 @@
 /*
  * FIXES APPLIED TO RESOLVE DATABASE ERRORS:
  * 
- * 1. FOREIGN KEY CONSTRAINT VIOLATION:
- *    - Problem: user_audit_logs table has foreign key reference to users table
- *    - Solution: Added transaction wrapper around cleanup operations for better error handling
- *    - Note: Deletion order was already correct (child table first, then parent table)
- * 
- * 2. MISSING REQUIRED FIELD:
+ * 1. MISSING REQUIRED FIELD:
  *    - Problem: password_hash field is NOT NULL in database schema but was missing in first test
  *    - Solution: Added password_hash field and value to the first test case
  *    - Used same hashed password value as other tests for consistency
@@ -38,18 +33,6 @@ describe('Database Test', function () {
   });
 
   beforeEach(async function () {
-    // Changes: Added transaction wrapper for better error handling
-    // The original code had foreign key constraint violations during cleanup
-    // because user_audit_logs table references users table via foreign key
-
-    // Changes Explained: BEGIN starts a transaction (groups multiple database
-    // operations together), COMMIT saves all changes permanently, and ROLLBACK
-    // undoes all changes if something goes wrong. This ensures either all 
-    // cleanup operations succeed together or none of them do, preventing 
-    // partial failures that could leave your database in a messy state.
-    await client.query('BEGIN');
-    
-    try {
       // Disable triggers temporarily for cleanup
       await client.query('ALTER TABLE users DISABLE TRIGGER user_audit_trigger');
       
@@ -60,14 +43,6 @@ describe('Database Test', function () {
       
       // Re-enable triggers
       await client.query('ALTER TABLE users ENABLE TRIGGER user_audit_trigger');
-      
-      // Commit the transaction
-      await client.query('COMMIT');
-    } catch (error) {
-      // Rollback on error
-      await client.query('ROLLBACK');
-      throw error;
-    }
   });
 
   it('should create a user with valid credentials', async function () {
